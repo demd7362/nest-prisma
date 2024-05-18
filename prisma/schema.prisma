@@ -1,0 +1,33 @@
+// npx prisma migrate dev -> 스키마 변경사항을 관리, 추적하는데 씀
+// 1. npx prisma generate -> init
+// 2. npx prisma db push -> 테이블 생성
+// 3. npx prisma studio -> 생성된 테이블 확인
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+}
+
+model User {
+  id        Int        @id @default(autoincrement())
+  email     String     @unique @db.VarChar(100)
+  password  String     @db.VarChar(100)
+  createdAt DateTime   @map("created_at")
+  updatedAt DateTime   @default(now()) @map("updated_at")
+  loginLogs LoginLog[]
+
+  @@map("user")
+}
+
+model LoginLog {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  loggedInAt DateTime @map("logged_in_at")
+  User       User     @relation(fields: [userId], references: [id])
+
+  @@map("login_log")
+}
