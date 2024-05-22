@@ -13,14 +13,82 @@ datasource db {
 }
 
 model User {
-  id        Int        @id @default(autoincrement())
-  email     String     @unique @db.VarChar(100)
-  password  String     @db.VarChar(100)
-  createdAt DateTime   @map("created_at")
-  updatedAt DateTime   @default(now()) @map("updated_at")
-  loginLogs LoginLog[]
+  // 소셜 로그인만 가능
+  id            Int             @id @default(autoincrement())
+  username      String          @unique @db.VarChar(12)
+  email         String          @unique @db.VarChar(100)
+  password      String          @db.VarChar(100)
+  createdAt     DateTime        @map("created_at")
+  updatedAt     DateTime        @default(now()) @map("updated_at")
+  loginLogs     LoginLog[]
+  Review        Review[]
+  ReviewComment ReviewComment[]
 
   @@map("user")
+}
+
+model Review {
+  id      Int    @id @default(autoincrement())
+  novelId Int
+  userId  Int
+  Novel   Novel  @relation(fields: [novelId], references: [id])
+  User    User   @relation(fields: [userId], references: [id])
+  content String @db.Text
+  like    Int
+  dislike Int
+
+  createdAt     DateTime        @map("created_at")
+  updatedAt     DateTime        @default(now()) @map("updated_at")
+  ReviewComment ReviewComment[]
+
+  @@map("review")
+}
+
+model ReviewComment {
+  id        Int      @id @default(autoincrement())
+  reviewId  Int
+  userId    Int
+  content   String   @db.Text
+  like      Int
+  dislike   Int
+  Review    Review   @relation(fields: [reviewId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("review_comment")
+}
+
+model Novel {
+  id        Int     @id @default(autoincrement())
+  title     String  @unique @db.VarChar(255)
+  author    String  @db.VarChar(50)
+  kakaoUrl  String? @db.VarChar(255)
+  naverUrl  String? @db.VarChar(255)
+  munpiaUrl String? @db.VarChar(255)
+  imgUrl    String  @db.VarChar(255)
+  rating    Float
+
+  releasedAt DateTime @map("released_at")
+
+  createdAt DateTime  @map("created_at")
+  updatedAt DateTime  @default(now()) @map("updated_at")
+  Review    Review[]
+  HashTag   HashTag[]
+
+  @@map("novel")
+}
+
+model HashTag {
+  id      Int    @id @default(autoincrement())
+  novelId Int    @map("novel_id")
+  Novel   Novel  @relation(fields: [novelId], references: [id])
+  name    String @db.VarChar(100)
+
+  createdAt DateTime @map("created_at")
+  updatedAt DateTime @default(now()) @map("updated_at")
+
+  @@map("hash_tag")
 }
 
 model LoginLog {

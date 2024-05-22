@@ -2,6 +2,7 @@
   "compilerOptions": {
     "module": "commonjs",
     "jsx": "react-jsx",
+    "esModuleInterop": true, // TypeError: (0 , cookie_parser_1.default) 때문에 추가
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
