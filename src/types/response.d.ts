@@ -1,5 +1,6 @@
-export interface ResponseBody {
-    message: string;
+export interface ResponseBody<T> {
+    message?: string;
     error?: string;
     statusCode: number;
+    data?: T;
 }

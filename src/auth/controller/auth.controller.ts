@@ -1,7 +1,7 @@
 import { Body, Controller, HttpCode, Post, Res } from '@nestjs/common';
 import { AuthService } from '../providers/auth.service';
 import { Response } from 'express';
-import { JoinRequestDTO, LoginRequestDTO } from '../dto/auth.dto';
+import { JoinRequestDto, LoginRequestDto } from '../dto/auth.dto';
 import { ResponseBody } from '../../types/response';
 
 
@@ -12,8 +12,8 @@ export class AuthController {
 
     @Post('login')
     @HttpCode(200)
-    async login(@Body() loginRequestDTO: LoginRequestDTO, @Res() response: Response) {
-        const accessToken = await this.authService.login(loginRequestDTO);
+    async login(@Body() loginRequestDto: LoginRequestDto, @Res() response: Response) {
+        const accessToken = await this.authService.login(loginRequestDto);
         response.cookie('$at', accessToken, {
             httpOnly: true
         });
@@ -24,13 +24,12 @@ export class AuthController {
     }
 
     @Post('join') // passthrough 있으면 return 값을 통해 리턴이 가능하다
-    async join(@Body() joinRequestDTO: JoinRequestDTO) {
-        await this.authService.join(joinRequestDTO);
-        const body: ResponseBody = {
-            statusCode: 201,
-            message: '회원가입 완료'
-        };
-        return body;
+    async join(@Body() joinRequestDto: JoinRequestDto):Promise<ResponseBody<unknown>> {
+        await this.authService.join(joinRequestDto);
+        return {
+            statusCode: 200,
+            message: '로그인 성공'
+        }
         // response.status(201).json(body);
     }
 

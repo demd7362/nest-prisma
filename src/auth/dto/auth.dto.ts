@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsString, Length } from 'class-validator';
 
-export class LoginRequestDTO {
+export class LoginRequestDto {
 
     @IsNotEmpty()
     @IsString()
@@ -12,7 +12,7 @@ export class LoginRequestDTO {
     @Length(6)
     password: string;
 }
-export class JoinRequestDTO {
+export class JoinRequestDto {
     @IsString()
     @Length(2)
     username: string;

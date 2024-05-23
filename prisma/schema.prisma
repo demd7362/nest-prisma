@@ -1,7 +1,8 @@
 // npx prisma migrate dev -> 스키마 변경사항을 관리, 추적하는데 씀
-// 1. npx prisma generate -> init
-// 2. npx prisma db push -> 테이블 생성
+// 1. npx prisma db push -> 테이블 생성
+// 2. npx prisma generate -> init
 // 3. npx prisma studio -> 생성된 테이블 확인
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,25 +15,25 @@ datasource db {
 
 model User {
   // 소셜 로그인만 가능
-  id            Int             @id @default(autoincrement())
-  username      String          @unique @db.VarChar(12)
-  email         String          @unique @db.VarChar(100)
-  password      String          @db.VarChar(100)
-  createdAt     DateTime        @map("created_at")
-  updatedAt     DateTime        @default(now()) @map("updated_at")
-  loginLogs     LoginLog[]
-  Review        Review[]
-  ReviewComment ReviewComment[]
+  id             Int             @id @default(autoincrement())
+  username       String          @unique @db.VarChar(12)
+  email          String          @unique @db.VarChar(100)
+  password       String          @db.VarChar(100)
+  createdAt      DateTime        @map("created_at")
+  updatedAt      DateTime        @default(now()) @map("updated_at")
+  lastLoggedInAt DateTime        @map("last_logged_in_at")
+  Review         Review[]
+  ReviewComment  ReviewComment[]
 
   @@map("user")
 }
 
 model Review {
   id      Int    @id @default(autoincrement())
-  novelId Int
-  userId  Int
-  Novel   Novel  @relation(fields: [novelId], references: [id])
-  User    User   @relation(fields: [userId], references: [id])
+  novelId Int    @map("novel_id")
+  userId  Int    @map("user_id")
+  novel   Novel  @relation(fields: [novelId], references: [id])
+  user    User   @relation(fields: [userId], references: [id])
   content String @db.Text
   like    Int
   dislike Int
@@ -46,15 +47,15 @@ model Review {
 
 model ReviewComment {
   id        Int      @id @default(autoincrement())
-  reviewId  Int
-  userId    Int
   content   String   @db.Text
-  like      Int
-  dislike   Int
-  Review    Review   @relation(fields: [reviewId], references: [id])
-  User      User     @relation(fields: [userId], references: [id])
+  like      Int      @default(0)
+  dislike   Int      @default(0)
+  reviewId  Int      @map("review_id")
+  userId    Int      @map("user_id")
+  review    Review   @relation(fields: [reviewId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("review_comment")
 }
@@ -63,18 +64,18 @@ model Novel {
   id        Int     @id @default(autoincrement())
   title     String  @unique @db.VarChar(255)
   author    String  @db.VarChar(50)
-  kakaoUrl  String? @db.VarChar(255)
-  naverUrl  String? @db.VarChar(255)
-  munpiaUrl String? @db.VarChar(255)
-  imgUrl    String  @db.VarChar(255)
+  kakaoUrl  String? @map("kakao_url") @db.VarChar(255)
+  naverUrl  String? @map("naver_url") @db.VarChar(255)
+  munpiaUrl String? @map("munpia_url") @db.VarChar(255)
+  imgUrl    String  @map("img_url") @db.VarChar(255)
   rating    Float
 
   releasedAt DateTime @map("released_at")
 
   createdAt DateTime  @map("created_at")
   updatedAt DateTime  @default(now()) @map("updated_at")
-  Review    Review[]
-  HashTag   HashTag[]
+  review    Review[]
+  hashTag   HashTag[]
 
   @@map("novel")
 }
@@ -82,20 +83,11 @@ model Novel {
 model HashTag {
   id      Int    @id @default(autoincrement())
   novelId Int    @map("novel_id")
-  Novel   Novel  @relation(fields: [novelId], references: [id])
-  name    String @db.VarChar(100)
+  novel   Novel  @relation(fields: [novelId], references: [id])
+  value   String @db.VarChar(100)
 
   createdAt DateTime @map("created_at")
-  updatedAt DateTime @default(now()) @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("hash_tag")
-}
-
-model LoginLog {
-  id         Int      @id @default(autoincrement())
-  userId     Int      @map("user_id")
-  loggedInAt DateTime @map("logged_in_at")
-  User       User     @relation(fields: [userId], references: [id])
-
-  @@map("login_log")
 }
