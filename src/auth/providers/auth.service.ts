@@ -31,27 +31,27 @@ export class AuthService {
 
     async login(loginRequestDto: LoginRequestDto): Promise<string | null> {
         const { email, password } = loginRequestDto;
-        const user: User = await this.prisma.user.findUnique({
+        const $user: User = await this.prisma.user.findUnique({
             where: {
                 email
             }
         });
-        if (!user) {
+        if (!$user) {
             throw new BadRequestException("잘못된 아이디입니다.");
         }
-        const isValid = await bcrypt.compare(password, user.password);
+        const isValid = await bcrypt.compare(password, $user.password);
         if (!isValid) {
             throw new BadRequestException("잘못된 패스워드입니다.");
         }
         const payload = {
             email: loginRequestDto.email,
-            sub: user.username
+            sub: $user.username,
+            id: $user.id
         };
         return this.jwtService.sign(payload);
     }
 
-    // 트랜잭션 어떻게 할지 https://velog.io/@yullivan/Prisma-interactive-transactions-%EB%AC%B8%EC%A0%9C
-    // 회원가입 페이지 제대로 만들기
+
     async join(joinRequestDto: JoinRequestDto) {
         const { username, password, email } = joinRequestDto;
         const hashedPassword = await bcrypt.hash(password, 10);

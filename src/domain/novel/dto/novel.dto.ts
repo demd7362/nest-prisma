@@ -1,10 +1,12 @@
-import { IsArray, IsDate, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsDate, IsNumber, IsOptional, IsString, ValidateIf, ValidateNested } from 'class-validator';
 import { Exclude, Expose, Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
 
 export class NovelDto {
     @IsNumber()
     @Expose()
-    id: number;
+    @IsOptional()
+    id?: number;
 
     @IsString()
     @Expose()
@@ -40,12 +42,7 @@ export class NovelDto {
     @Expose()
     releasedAt: Date;
 
-    @Exclude()
-    createdAt: Date;
-    @Exclude()
-    updatedAt: Date;
-
-
-
+}
+export class OptionalNovelDto extends PartialType(NovelDto){
 
 }

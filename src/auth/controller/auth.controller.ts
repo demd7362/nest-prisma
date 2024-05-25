@@ -11,7 +11,6 @@ export class AuthController {
     }
 
     @Post('login')
-    @HttpCode(200)
     async login(@Body() loginRequestDto: LoginRequestDto, @Res() response: Response) {
         const accessToken = await this.authService.login(loginRequestDto);
         response.cookie('$at', accessToken, {
@@ -24,13 +23,12 @@ export class AuthController {
     }
 
     @Post('join') // passthrough 있으면 return 값을 통해 리턴이 가능하다
-    async join(@Body() joinRequestDto: JoinRequestDto):Promise<ResponseBody<unknown>> {
+    async join(@Body() joinRequestDto: JoinRequestDto):Promise<ResponseBody> {
         await this.authService.join(joinRequestDto);
         return {
             statusCode: 200,
             message: '로그인 성공'
         }
-        // response.status(201).json(body);
     }
 
 }
