@@ -66,14 +66,17 @@ export class NovelService {
 
         return pagination;
     }
-
     async createNovel(novelDto: NovelDto) {
-        const $novel = await this.prisma.novel.create({
-            data: {
-                ...novelDto,
-                createdAt: new Date()
-            }
-        });
+        const $novel = this.prisma.$transaction(async (prisma) => {
+            return prisma.novel.create({
+                data: {
+                    ...novelDto,
+                    createdAt: new Date()
+                }
+            });
+        })
+
+
         return plainToInstance(NovelDto, $novel);
     }
 

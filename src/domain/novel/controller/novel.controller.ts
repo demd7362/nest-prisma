@@ -47,9 +47,10 @@ export class NovelController {
 
     @Post()
     async createNovel(@Body() novelDto: NovelDto) {
-        await this.novelService.createNovel(novelDto);
+        const novel = await this.novelService.createNovel(novelDto);
         return {
-            statusCode: 201
+            statusCode: 201,
+            data: novel
         };
     }
 

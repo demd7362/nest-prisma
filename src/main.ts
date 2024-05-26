@@ -17,6 +17,7 @@ async function bootstrap() {
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api', app, document);
+    // http://localhost/api
 
     const corsOptions: CorsOptions = {
         origin: process.env.FRONTEND_URL,
