@@ -25,11 +25,13 @@ export class AuthService {
     }
 
 
-    async login(email: string, name: string, photo: string, provider: Provider) {
-
+    async login(email: string, provider: Provider) {
         let $user = await this.prisma.user.findUnique({
             where: {
-                email
+                email_provider: {
+                    email,
+                    provider
+                }
             }
         });
         if (!$user) {
@@ -37,14 +39,9 @@ export class AuthService {
             $user = await this.prisma.user.create({
                 data: {
                     email,
-                    provider: {
-                        connect: { name: provider }
-                    },
+                    provider,
                     createdAt: now,
                     lastLoggedInAt: now
-                },
-                include: {
-                    provider: true
                 }
             });
         }

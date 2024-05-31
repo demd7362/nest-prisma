@@ -9,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuthController } from './controller/auth.controller';
 import { JwtGoogleStrategy } from './strategies/jwt.google.strategy';
+import { JwtNaverStrategy } from './strategies/jwt.naver.strategy';
+import { JwtKakaoStrategy } from './strategies/jwt.kakao.strategy';
 
 @Module({
     imports: [
@@ -26,6 +28,8 @@ import { JwtGoogleStrategy } from './strategies/jwt.google.strategy';
         AuthService,
         PrismaService,
         JwtGoogleStrategy,
+        JwtNaverStrategy,
+        JwtKakaoStrategy
     ],
     controllers: [
         AuthController
