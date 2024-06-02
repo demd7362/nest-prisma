@@ -7,6 +7,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
     constructor() {
         super({
             log: ['query', 'info', 'warn', 'error'],
+            transactionOptions: {
+                timeout: 300000,  // 300초 , 디버깅용
+                maxWait: 5000 // 5초
+            }
         });
     }
     async onModuleDestroy() {

@@ -1,17 +1,18 @@
-import { Body, Controller, Delete, Get, Injectable, Param, Patch, Post } from '@nestjs/common';
-import { Review } from '@prisma/client';
+import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { ReviewService } from '../service/review.service';
 import { OptionalReviewCommentDto, OptionalReviewDto, ReviewCommentDto, ReviewDto } from '../dto/review.dto';
-import { ResponseBody } from '../../../types/response';
+import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @Controller('reviews')
+@ApiTags('reviews API')
 export class ReviewController {
 
     constructor(private readonly reviewService: ReviewService) {
     }
 
     @Get(':id')
-    async findReviewById(@Param('id') id: number): Promise<ResponseBody> {
+    @ApiOperation({ description: '리뷰 id 조회' })
+    async findReviewById(@Param('id') id: number) {
         const review = await this.reviewService.findReviewById(id);
         return {
             statusCode: 200,
@@ -19,8 +20,11 @@ export class ReviewController {
         };
     }
 
+
+
     @Post()
-    async createReview(@Body() reviewDto: ReviewDto): Promise<ResponseBody> {
+    @ApiOperation({ description: '리뷰 생성' })
+    async createReview(@Body() reviewDto: ReviewDto) {
         const review = await this.reviewService.createReview(reviewDto);
         return {
             statusCode: 201,
@@ -29,7 +33,8 @@ export class ReviewController {
     }
 
     @Patch(':id')
-    async updateReviewById(@Param('id') id: number, @Body() reviewDto: OptionalReviewDto): Promise<ResponseBody> {
+    @ApiOperation({ description: '리뷰 데이터 수정' })
+    async updateReviewById(@Param('id') id: number, @Body() reviewDto: OptionalReviewDto) {
         const review = await this.reviewService.updateReviewById(id, reviewDto);
         return {
             statusCode: 200,
@@ -38,7 +43,8 @@ export class ReviewController {
     }
 
     @Delete(':id')
-    async deleteReviewById(@Param('id') id: number): Promise<ResponseBody> {
+    @ApiOperation({ description: '리뷰 데이터 삭제' })
+    async deleteReviewById(@Param('id') id: number) {
         await this.reviewService.deleteReviewById(id);
         return {
             statusCode: 204
@@ -46,6 +52,7 @@ export class ReviewController {
     }
 
     @Get(':reviewId/comments')
+    @ApiOperation({ description: '리뷰 id 하위 댓글 조회' })
     async findCommentByReviewId(@Param('reviewId') reviewId: number) {
         const reviewComments = await this.reviewService.findCommentByReviewId(reviewId);
         return {
@@ -55,6 +62,7 @@ export class ReviewController {
     }
 
     @Post(':reviewId/comments')
+    @ApiOperation({ description: '리뷰 id 하위 댓글 생성' })
     async createComment(@Param('reviewId') reviewId: number, @Body() reviewCommentDto: ReviewCommentDto) {
         const comment = await this.reviewService.createComment(reviewId, reviewCommentDto);
         return {
@@ -64,6 +72,7 @@ export class ReviewController {
     }
 
     @Patch('comments/:commentId')
+    @ApiOperation({ description: '댓글 id로 데이터 수정' })
     async updateCommentById(@Param('commentId') commentId: number, @Body() reviewCommentDto: OptionalReviewCommentDto) {
         const comment = await this.reviewService.updateCommentById(commentId, reviewCommentDto);
         return {
@@ -73,10 +82,11 @@ export class ReviewController {
     }
 
     @Delete('comments/:commentId')
+    @ApiOperation({ description: '댓글 id로 데이터 삭제' })
     async deleteCommentById(@Param('commentId') commentId: number) {
         await this.reviewService.deleteCommentById(commentId);
         return {
-            statusCode: 204,
+            statusCode: 204
         };
     }
 

@@ -32,8 +32,8 @@ model Review {
   id      Int    @id @default(autoincrement())
   novelId Int    @map("novel_id")
   userId  Int    @map("user_id")
-  novel   Novel  @relation(fields: [novelId], references: [id])
-  user    User   @relation(fields: [userId], references: [id])
+  novel   Novel  @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   content String @db.Text
   like    Int    @default(0)
   dislike Int    @default(0)
@@ -52,8 +52,8 @@ model ReviewComment {
   dislike   Int      @default(0)
   reviewId  Int      @map("review_id")
   userId    Int      @map("user_id")
-  review    Review   @relation(fields: [reviewId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+  review    Review   @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
@@ -62,7 +62,7 @@ model ReviewComment {
 
 model Novel {
   id        Int     @id @default(autoincrement())
-  title     String  @unique @db.VarChar(255)
+  title     String  @db.VarChar(255)
   author    String  @db.VarChar(50)
   kakaoUrl  String? @map("kakao_url") @db.VarChar(255)
   naverUrl  String? @map("naver_url") @db.VarChar(255)
@@ -72,22 +72,32 @@ model Novel {
 
   releasedAt DateTime @map("released_at")
 
-  createdAt DateTime  @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  review    Review[]
-  hashTag   HashTag[]
+  createdAt     DateTime       @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  review        Review[]
+  novelHashTags NovelHashTag[]
 
+  @@unique([author, title])
   @@map("novel")
 }
 
-model HashTag {
-  id      Int    @id @default(autoincrement())
-  novelId Int    @map("novel_id")
-  novel   Novel  @relation(fields: [novelId], references: [id])
-  value   String @db.VarChar(100)
+model NovelHashTag {
+  novel     Novel   @relation(fields: [novelId], references: [id], onDelete: Cascade)
+  novelId   Int     @map("novel_id")
+  hashTag   HashTag @relation(fields: [hashTagId], references: [id], onDelete: Cascade)
+  hashTagId Int     @map("hash_tag_id")
 
-  createdAt DateTime @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  @@id([novelId, hashTagId])
+  @@map("novel_hash_tag")
+}
+
+model HashTag {
+  id    Int    @id @default(autoincrement())
+  value String @unique @db.VarChar(100)
+
+  createdAt     DateTime       @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  novelHashTags NovelHashTag[]
 
   @@map("hash_tag")
 }

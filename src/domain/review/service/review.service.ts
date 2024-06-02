@@ -22,7 +22,7 @@ export class ReviewService {
         return plainToInstance(ReviewDto, $reviews);
     }
 
-    async findReviewByPagination(page: number, pageSize: number) {
+    async findReviewByPagination(novelId: number, page: number, pageSize: number) {
         const skip = (page - 1) * pageSize;
         const take = pageSize;
 
@@ -38,7 +38,7 @@ export class ReviewService {
         const pagination: Pagination<ReviewDto> = {
             data: plainToInstance(ReviewDto, reviews),
             totalCount,
-            pageNumber: page,
+            page,
             pageSize,
             totalPages,
             hasPreviousPage,

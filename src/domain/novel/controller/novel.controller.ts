@@ -1,31 +1,42 @@
 import { Body, Controller, DefaultValuePipe, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import { NovelService } from '../service/novel.service';
 import { NovelDto, OptionalNovelDto } from '../dto/novel.dto';
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ReviewService } from '../../review/service/review.service';
+
 
 @Controller('novels')
-@ApiTags('novels')
+@ApiTags('novels API')
 export class NovelController {
 
 
-    constructor(private readonly novelService: NovelService) {
+    constructor(private readonly novelService: NovelService,
+                private readonly reviewService: ReviewService) {
     }
 
-    // @Get()
-    // @ApiResponse({ status: 200, description: '모든 웹소설 목록 반환' })
-    // @ApiBody({ type: NovelDto })
-    // async findAll() {
-    //     const novels = await this.novelService.findAll();
-    //     return {
-    //         statusCode: 200,
-    //         data: novels
-    //     };
-    // }
-
-
     @Get()
-    async findNovelByPagination(@Query('search', new DefaultValuePipe('')) search: string, @Query('page') page: number, @Query('pageSize') pageSize: number) {
-        const pagination = await this.novelService.findNovelByPagination(search, page, pageSize);
+    @ApiQuery({
+        name: 'query',
+        required: false,
+        type: String
+    })
+    @ApiQuery({
+        name: 'page',
+        required: false,
+        type: Number,
+        description: 'default 1'
+    })
+    @ApiQuery({
+        name: 'pageSize',
+        required: false,
+        type: Number,
+        description: 'default 20'
+    })
+    @ApiOperation({ description: '소설 검색 및 페이지네이션' })
+    async findNovelByPagination(@Query('query', new DefaultValuePipe('')) query: string,
+                                @Query('page', new DefaultValuePipe(1)) page: number,
+                                @Query('pageSize', new DefaultValuePipe(20)) pageSize: number) {
+        const pagination = await this.novelService.findNovelByPagination(query, page, pageSize);
         const { data: novels, ...rest } = pagination;
         return {
             statusCode: 200,
@@ -36,7 +47,30 @@ export class NovelController {
         };
     }
 
+    @Get(':id/reviews')
+    @ApiQuery({
+        name: 'page',
+        required: false,
+        type: Number,
+        description: 'default 1'
+    })
+    @ApiQuery({
+        name: 'pageSize',
+        required: false,
+        type: Number,
+        description: 'default 20'
+    })
+    @ApiOperation({ description: '소설 리뷰 페이지네이션' })
+    async findReviewByPagination(@Param('id') id: number,
+                                 @Query('page', new DefaultValuePipe(1)) page: number,
+                                 @Query('pageSize', new DefaultValuePipe(20)) pageSize: number) {
+        await this.reviewService.findReviewByPagination(id, page, pageSize);
+
+    }
+
+
     @Get(':id')
+    @ApiOperation({ description: '소설 id 조회' })
     async findNovelById(@Param('id') id: number) {
         const novel = await this.novelService.findNovelById(id);
         return {
@@ -46,6 +80,7 @@ export class NovelController {
     }
 
     @Post()
+    @ApiOperation({ summary: '소설 생성' })
     async createNovel(@Body() novelDto: NovelDto) {
         const novel = await this.novelService.createNovel(novelDto);
         return {
@@ -55,6 +90,7 @@ export class NovelController {
     }
 
     @Patch(':id')
+    @ApiOperation({ description: '소설 데이터 수정' })
     async updateNovelById(@Param('id') id: number, @Body() novelDto: OptionalNovelDto) {
         const novel = await this.novelService.updateNovelById(id, novelDto);
         return {
@@ -64,6 +100,7 @@ export class NovelController {
     }
 
     @Delete(':id')
+    @ApiOperation({ description: '소설 삭제' })
     async deleteById(@Param('id') id: number) {
         await this.novelService.deleteNovelById(id);
         return {

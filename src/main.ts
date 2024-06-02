@@ -14,6 +14,8 @@ async function bootstrap() {
         .setTitle('API docs')
         .setDescription('API Descriptions')
         .setVersion('1.0')
+        .addCookieAuth('$at')
+        .addServer('/api') // swagger prefix setting
         .build();
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api', app, document);
